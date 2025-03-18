@@ -1,0 +1,14 @@
+<h1> Bienvenido, {{user.first_name}}</h1>
+<h4> Informacion personal:</h4>
+<div>
+    <p>Nombre: {{user.first_name}}</p>
+    <p>Apellido: {{user.last_name}}</p>
+    <p>Email: {{user.email}}</p>
+    <p>Edad: {{user.age}}</p>
+    <p>Rol en la plataforma: {{user.role}}</p>
+    <p>Id de mi carrito: {{user.cart}}</p>
+</div>
+
+<form action="/api/sessions/logout" method="post">
+    <button type="submit" class="btn"> Logout </button>
+</form>
