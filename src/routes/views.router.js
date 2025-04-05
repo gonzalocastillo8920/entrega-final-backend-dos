@@ -1,12 +1,17 @@
-import express from "express";
+import { Router } from "express";
 import ProductManager from "../dao/db/product.manager.js";
-import CartManager from "../dao/db/cart.manager.js";
+// import CartManager from "../dao/db/cart.manager.js";
+import sessionsRouter from "./sessions.router.js";
+import cartRouter from "../routes/carts.router.js";
+// import productRouter from "../routes/products.router.js";
 
-const router = express.Router();
+const router = Router();
+
 const productManager = new ProductManager();
-const cartManager = new CartManager();
+// const cartManager = new CartManager();
 
-// Mostrar Todos los Productos:
+//! Mostrar Todos los Productos:
+// router.get("/products", productRouter);
 router.get("/products", async (req, res) => {
     try {
         const { page = 1, limit = 3 } = req.query;
@@ -37,35 +42,36 @@ router.get("/products", async (req, res) => {
     };
 });
 
-// Mostrar un Carrito por su ID:
-router.get("/carts/:cid", async (req, res) => {
-    const carritoId = req.params.cid;
+//! Mostrar un Carrito por su "ID":
+router.get("/carts", cartRouter);
+// router.get("/carts/:cid", async (req, res) => {
+//     const carritoId = req.params.cid;
 
-    try {
-        const carrito = await cartManager.obtenerCarritoPorId(carritoId);
+//     try {
+//         const carrito = await cartManager.obtenerCarritoPorId(carritoId);
 
-        if (!carrito) {
-            console.log("No existe el carrito con ese Id. " + error);
-            return res.status({ mensaje: "Carrito no encontrado.", error });
-        };
+//         if (!carrito) {
+//             console.log("No existe el carrito con ese Id. " + error);
+//             return res.status({ mensaje: "Carrito no encontrado.", error });
+//         };
 
-        const productosCarrito = carrito.products.map(p => ({
-            product: p.product.toObject(),
-            quantity: p.quantity
-        }));
+//         const productosCarrito = carrito.products.map(p => ({
+//             product: p.product.toObject(),
+//             quantity: p.quantity
+//         }));
 
-        res.render("carts", {productos: productosCarrito,});
+//         res.render("carts", { productos: productosCarrito, });
 
-    } catch (error) {
-        console.log("Error obteniendo el carrito. " + error);
-        res.status(500).json({mensaje: "Error en Servidor/DB.", error });
-    };
-});
+//     } catch (error) {
+//         console.log("Error obteniendo el carrito. " + error);
+//         res.status(500).json({ mensaje: "Error en Servidor/DB.", error });
+//     };
+// });
 
 router.get("/register", (req, res) => {
     res.render("register");
 });
-
+//router.use("/login", sessionsRouter);
 router.get("/login", (req, res) => {
     res.render("login");
 });
