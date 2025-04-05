@@ -22,11 +22,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gonzalocastillo8920/primera-entrega-backend-dos.git"
+    "url": "https://github.com/gonzalocastillo8920/pre-entrega-final-backend-dos"
   },
   "bugs": {
-    "url": "https://github.com/gonzalocastillo8920/primera-entrega-backend-dos/issues"
+    "url": "https://github.com/gonzalocastillo8920/pre-entrega-final-backend-dos"
   },
-  "homepage": "https://github.com/gonzalocastillo8920/primera-entrega-backend-dos#readme",
+  "homepage": "https://github.com/gonzalocastillo8920/pre-entrega-final-backend-dos#readme",
   "description": ""
 }
