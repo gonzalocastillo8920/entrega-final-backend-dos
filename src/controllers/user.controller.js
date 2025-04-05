@@ -1,5 +1,5 @@
 import userService from "../services/user.service.js";
-import CartManager from "../managers/cart.manager.js";
+import CartManager from "../dao/db/cart.manager.js";
 import jwt from "jsonwebtoken";
 
 const manager = new CartManager();
@@ -25,9 +25,10 @@ class UserController {
             const token = jwt.sign({
                 user: `${newUser.first_name} ${newUser.last_name}`,
                 email: newUser.email,
-                role: newUser.role
+                role: newUser.role,
+                cart: newUser.cart
             }, "coderhouse", { expiresIn: "1h" });
-
+            
             res.cookie("coderCookieToken", token, { maxAge: 360000, httpOnly: true });
             res.redirect("/api/sessions/current");
 
@@ -41,20 +42,14 @@ class UserController {
         try {
 
             const { email, password } = req.body;
-            // const user = await UserModel.findOne({ email });
-
-            // if (!user) {
-            //     return res.status(401).send({ message: "Usuario no encontrado" });
-            // };
-            // if (!isValidPassword(password, user)) {
-            //     return res.status(401).send({ message: "Contraseña incorrecta" });
-            // };
+            
             const user = await userService.loginUser(email, password);
 
             const token = jwt.sign({
                 user: `${user.first_name} ${user.last_name}`,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                cart: user.cart
             }, "coderhouse", { expiresIn: "1h" });
 
             res.cookie("coderCookieToken", token, { httpOnly: true, maxAge: 3600000 });
@@ -68,7 +63,8 @@ class UserController {
 
     async current(req, res) {
         if (req.user) {
-            res.render("profile", { user: req.user.user });
+            const user = req.user;
+            res.render("profile", { user: user });
         } else {
             res.send("No estas autorizado");
         };

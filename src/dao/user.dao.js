@@ -1,4 +1,4 @@
-import UsuarioModel from "./models/users.model.js";
+import UsuarioModel from "./models/user.model.js";
 
 class UserDao {
     async findById(id) {
