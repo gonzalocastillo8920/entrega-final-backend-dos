@@ -1,0 +1,20 @@
+<h1>Aqui se muestran los productos en tiempo real!</h1>
+
+<h2>Ingresar nuevos productos:</h2>
+<form>
+    <input type="text" id="code" placeholder="Codigo">
+    <input type="text" id="title" placeholder="Titulo">
+    <input type="number" id="price" placeholder="Precio">
+    <input type="text" id="category" placeholder="Categoria">
+    <input type="number" id="stock" placeholder="Stock">
+    <input type="text" id="description" placeholder="Descripcion">
+    <label for="status">Estado:</label>
+    <select id="status">
+        <option value="null"> Seleccione... </option>
+        <option value="true"> Activo </option>
+        <option value="false"> Inactivo </option>
+    </select>
+    <button id="btn-enviar"> Enviar </button>
+</form>
+
+<div id="product-list" class="productos"></div>

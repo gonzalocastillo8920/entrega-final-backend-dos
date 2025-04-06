@@ -1,6 +1,7 @@
 import userService from "../services/user.service.js";
 import CartManager from "../dao/db/cart.manager.js";
 import jwt from "jsonwebtoken";
+import UserDTO from "../dto/user.dto.js";
 
 const manager = new CartManager();
 
@@ -64,7 +65,8 @@ class UserController {
     async current(req, res) {
         if (req.user) {
             const user = req.user;
-            res.render("profile", { user: user });
+            const userDto = new UserDTO(user);
+            res.render("profile", { user: userDto });
         } else {
             res.send("No estas autorizado");
         };

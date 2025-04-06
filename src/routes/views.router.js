@@ -1,49 +1,44 @@
 import { Router } from "express";
-import ProductManager from "../dao/db/product.manager.js";
-// import CartManager from "../dao/db/cart.manager.js";
-import sessionsRouter from "./sessions.router.js";
-import cartRouter from "../routes/carts.router.js";
-// import productRouter from "../routes/products.router.js";
+import ViewsController from "../controllers/views.controller.js";
+import passport from "passport";
 
 const router = Router();
+const viewsController = new ViewsController();
 
-const productManager = new ProductManager();
-// const cartManager = new CartManager();
 
 //! Mostrar Todos los Productos:
-// router.get("/products", productRouter);
-router.get("/products", async (req, res) => {
-    try {
-        const { page = 1, limit = 3 } = req.query;
+router.get("/products", passport.authenticate("current", {session: false}), viewsController.renderProducts);
+// router.get("/products", passport.authenticate("current", {session: false}), async (req, res) => {
+//     try {
+//         const { page = 1, limit = 3 } = req.query;
+//         const productos = await productManager.obtenerProductos({
+//             page: parseInt(page),
+//             limit: parseInt(limit)
+//         });
 
-        const productos = await productManager.obtenerProductos({
-            page: parseInt(page),
-            limit: parseInt(limit)
-        });
+//         const todosProductos = productos.docs.map(producto => {
+//             const { _id, ...rest } = producto.toObject();
+//             return rest;
+//         });
 
-        const todosProductos = productos.docs.map(producto => {
-            const { _id, ...rest } = producto.toObject();
-            return rest;
-        });
+//         res.render("products", {
+//             productos: todosProductos,
+//             hasPrevPage: productos.hasPrevPage,
+//             hasNextPage: productos.hasNextPage,
+//             prevPage: productos.prevPage,
+//             nextPage: productos.nextPage,
+//             currentPage: productos.page,
+//             totalPages: productos.totalPages
+//         });
 
-        res.render("products", {
-            productos: todosProductos,
-            hasPrevPage: productos.hasPrevPage,
-            hasNextPage: productos.hasNextPage,
-            prevPage: productos.prevPage,
-            nextPage: productos.nextPage,
-            currentPage: productos.page,
-            totalPages: productos.totalPages
-        });
-
-    } catch (error) {
-        console.log("Error al obtener los productos. " + error);
-        res.status(500).json({ mensaje: "Error en Servidor/DB.", error });
-    };
-});
+//     } catch (error) {
+//         console.log("Error al obtener los productos. " + error);
+//         res.status(500).json({ mensaje: "Error en Servidor/DB.", error });
+//     };
+// });
 
 //! Mostrar un Carrito por su "ID":
-router.get("/carts", cartRouter);
+router.get("/carts/:cid", viewsController.renderCart);
 // router.get("/carts/:cid", async (req, res) => {
 //     const carritoId = req.params.cid;
 
@@ -68,12 +63,18 @@ router.get("/carts", cartRouter);
 //     };
 // });
 
-router.get("/register", (req, res) => {
-    res.render("register");
-});
-//router.use("/login", sessionsRouter);
-router.get("/login", (req, res) => {
-    res.render("login");
-});
+router.get("/realTimeProducts", passport.authenticate("current", {session: false}), viewsController.renderRealTimeProducts);
+
+router.get("/register", viewsController.renderRegister);
+// router.get("/register", (req, res) => {
+//     res.render("register");
+// });
+
+router.get("/login", viewsController.renderLogin);
+// router.get("/login", (req, res) => {
+//     res.render("login");
+// });
+
+router.get("/", viewsController.renderHome);
 
 export default router;
