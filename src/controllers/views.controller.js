@@ -1,46 +1,44 @@
-import ProductModel from "../dao/models/product.model.js";
+import ProductManager from "../dao/db/product.manager.js";
 import CartService from "../services/cart.service.js";
 const cartService = new CartService();
+const productManager = new ProductManager();
 
 class ViewsController {
     async renderProducts(req, res) {
+
         try {
             const { page = 1, limit = 3 } = req.query;
+            const productos = await productManager.obtenerProductos({
+                page: parseInt(page),
+                limit: parseInt(limit)
+            });
 
-            const skip = (page - 1) * limit;
-
-            const products = await ProductModel
-                .find()
-                .skip(skip)
-                .limit(limit);
-
-            const totalProducts = await ProductModel.countDocuments();
-            const totalPages = Math.ceil(totalProducts / limit);
-
-            const hasPrevPage = page > 1;
-            const hasNextPage = page < totalPages;
+            const todosProductos = productos.docs.map(producto => {
+                const { _id, ...rest } = producto.toObject();
+                return rest;
+            });
 
             res.render("products", {
-                products: products,
-                hasPrevPage,
-                hasNextPage,
-                prevPage: page > 1 ? parseInt(page) - 1 : null,
-                nextPage: page < totalPages ? parseInt(page) + 1 : null,
-                currentPage: parseInt(page),
-                totalPages
+                productos: todosProductos,
+                hasPrevPage: productos.hasPrevPage,
+                hasNextPage: productos.hasNextPage,
+                prevPage: productos.prevPage,
+                nextPage: productos.nextPage,
+                currentPage: productos.page,
+                totalPages: productos.totalPages
             });
 
         } catch (error) {
+            console.log("Error al obtener los productos. " + error);
             res.status(500).json({ mensaje: "Error en Servidor/DB.", error });
         };
     };
 
     async renderCart(req, res) {
         try {
-            const cartId = req.params.cid;
-            const cart = await cartService.getElementsInCart(cartId);
-
-            if (!cart) throw new Error("No existe carrito con ese id");
+            const cid = req.params.cid;
+            const cart = await cartService.getElementsInCart(cid);
+            if (!cart) throw new Error("Error al buscar carrito con ese id");
 
             let Amount = 0;
 
@@ -54,11 +52,11 @@ class ViewsController {
                 return {
                     product: { ...product, totalPrice },
                     quantity,
-                    cartId
+                    cid
                 };
             });
 
-            res.render("carts", { products: totalProducts, Amount, cartId });
+            res.render("carts", { products: totalProducts, Amount, cid });
 
         } catch (error) {
             throw error;
@@ -66,7 +64,7 @@ class ViewsController {
     };
 
     async renderLogin(req, res) {
-        res.dender("login");
+        res.render("login");
     };
 
     async renderRegister(req, res) {
@@ -77,12 +75,12 @@ class ViewsController {
         try {
             res.render("realtimeproducts");
         } catch (error) {
-            res.status(500).json({error: "Error interno del servidor"});
+            res.status(500).json({ error: "Error interno del servidor" });
         };
     };
 
     async renderHome(req, res) {
-        res.dender("home");
+        res.render("products");
     };
 };
 

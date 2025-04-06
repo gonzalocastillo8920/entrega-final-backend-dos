@@ -41,8 +41,8 @@ class ProductController {
 
     async updateProduct(req, res) {
         try {
-            const { Id } = req.params;
-            const updatedProduct = await ProductService.updateProduct(Id, req.body);
+            const pid = req.params;
+            const updatedProduct = await ProductService.updateProduct(pid, req.body);
             res.status(200).json({ mensaje: "Producto actualizado con exito", payload: updatedProduct });
 
         } catch (error) {
@@ -52,8 +52,8 @@ class ProductController {
 
     async getProductById(req, res) {
         try {
-            const { Id } = req.params;
-            const product = await ProductService.getProductById(Id);
+            const pid = req.params;
+            const product = await ProductService.getProductById(pid);
 
             if (!product) {
                 return res.status(404).json({ mensaje: "No pudimos encontrar ese producto, verifique" });
@@ -69,8 +69,8 @@ class ProductController {
 
     async deleteProductById(req, res) {
         try {
-            const { Id } = req.params;
-            const deletedProduct = await ProductService.deleteProduct(Id);
+            const pid= req.params;
+            const deletedProduct = await ProductService.deleteProduct(pid);
             res.status(200).json({
                 mensaje: "Producto borrado exitosamente!",
                 payload: deletedProduct

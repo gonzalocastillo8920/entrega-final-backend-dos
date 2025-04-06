@@ -2,7 +2,6 @@ import userService from "../services/user.service.js";
 import CartManager from "../dao/db/cart.manager.js";
 import jwt from "jsonwebtoken";
 import UserDTO from "../dto/user.dto.js";
-
 const manager = new CartManager();
 
 class UserController {
@@ -41,7 +40,6 @@ class UserController {
 
     async login(req, res) {
         try {
-
             const { email, password } = req.body;
             
             const user = await userService.loginUser(email, password);

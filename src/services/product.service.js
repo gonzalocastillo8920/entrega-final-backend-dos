@@ -2,7 +2,7 @@ import productDao from "../dao/product.dao.js";
 
 class ProductService {
 
-    async getAllPoducts(query, sort, page = 1, limit = 10) {
+    async getAllProducts(query, sort, page = 1, limit = 10) {
         try {
             const filter = query ? { $or: [{ category: query }, { stock: { $gt: 0 } }] } : {};
             const sortOrder = sort === 'asc' ? { price: 1 } : sort === 'desc' ? { price: -1 } : {};
@@ -14,9 +14,9 @@ class ProductService {
         };
     };
 
-    async createProduct(data) {
+    async createProduct(prod) {
         try {
-            const product = await productDao.createProduct(data);
+            const product = await productDao.createProduct(prod);
             if(!product) throw new Error("Error al crear el producto");
             return product;
         } catch (error) {

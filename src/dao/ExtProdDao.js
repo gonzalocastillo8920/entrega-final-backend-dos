@@ -4,20 +4,20 @@ class ExtProdDao {
         return await ProductModel.find({});
     }
 
-    async createProduct(data) {
-        return await ProductModel.create(data);
+    async createProduct(prod) {
+        return await ProductModel.create(prod);
     };
 
-    async getProductById(id) {
-        return await ProductModel.findById(id);
+    async getProductById(pid) {
+        return await ProductModel.findById(pid);
     };
 
-    async updateProduct(id, data) {
-        return await ProductModel.findByIdAndUpdate(id, data, {new: true});
+    async updateProduct(pid, prod) {
+        return await ProductModel.findByIdAndUpdate(pid, prod, {new: true});
     };
 
-    async deleteProduct(id) {
-        return await ProductModel.findByIdAndDelete(id);
+    async deleteProduct(pid) {
+        return await ProductModel.findByIdAndDelete(pid);
     };
 };
 
