@@ -1,50 +1,25 @@
-import ProductService from "../services/product.service.js";
+import ProductRepository from "../repositories/product.repository.js";
 
 class ProductController {
 
+    async addProduct(req, res) {
+        try {
+            const newProduct = req.body;
+            const result = await ProductRepository.addProduct(newProduct);
+            res.status(200).json({
+                mensaje: "Producto creado satisfactoriamente",
+                payload: result
+            });
+        } catch (error) {
+            res.status(500).json({ mensaje: "Error en Servidor/DB.", error });
+        };
+    };
+
     async getAllProducts(req, res) {
         try {
-            const { limit = 10, page = 1, sort, query } = req.query;
-
-            const products = await ProductService.getAllProducts({
-                limit: limit,
-                page: page,
-                sort,
-                query
-            });
-
-            res.status(200).json({
-                status: "success",
-                payload: products,
-                totalPages: products.totalPages,
-                prevPage: products.prevPage,
-                nextPage: products.nextPage,
-                page: products.page,
-                hasPrevPage: products.hasPrevPage,
-                hasNextPage: products.hasNextPage,
-                prevLink: products.hasPrevPage ? `/api/products?limit=${limit}&page=${products.prevPage}&sort=${sort}&query=${query}` : null,
-                nextLink: products.hasNextPage ? `/api/products?limit=${limit}&page=${products.nextPage}&sort=${sort}&query=${query}` : null,
-            });
-        } catch (error) {
-            res.status(500).json({ mensaje: "Error en Servidor/DB.", error });
-        };
-    };
-
-    async createProduct(req, res) {
-        try {
-            const newProduct = await ProductService.createProduct(req.body);
-            res.status(200).json({ mensaje: "Producto creado satisfactoriamente", payload: newProduct });
-        } catch (error) {
-            res.status(500).json({ mensaje: "Error en Servidor/DB.", error });
-        };
-    };
-
-    async updateProduct(req, res) {
-        try {
-            const pid = req.params;
-            const updatedProduct = await ProductService.updateProduct(pid, req.body);
-            res.status(200).json({ mensaje: "Producto actualizado con exito", payload: updatedProduct });
-
+            let { limit = 10, page = 1, sort, query } = req.query;
+            const products = await ProductRepository.getAllProducts(limit, page, sort, query);
+            res.json(products);
         } catch (error) {
             res.status(500).json({ mensaje: "Error en Servidor/DB.", error });
         };
@@ -52,8 +27,8 @@ class ProductController {
 
     async getProductById(req, res) {
         try {
-            const pid = req.params;
-            const product = await ProductService.getProductById(pid);
+            const pid = req.params.pid;
+            const product = await ProductRepository.getProductById(pid);
 
             if (!product) {
                 return res.status(404).json({ mensaje: "No pudimos encontrar ese producto, verifique" });
@@ -67,10 +42,26 @@ class ProductController {
         };
     };
 
+
+    async updateProduct(req, res) {
+        try {
+            const pid = req.params;
+            const updatedProduct = req.body;
+            const result = await ProductRepository.updateProduct(pid, updatedProduct);
+            res.status(200).json({
+                mensaje: "Producto actualizado con exito",
+                payload: result
+            });
+        } catch (error) {
+            res.status(500).json({ mensaje: "Error en Servidor/DB.", error });
+        };
+    };
+
+
     async deleteProductById(req, res) {
         try {
-            const pid= req.params;
-            const deletedProduct = await ProductService.deleteProduct(pid);
+            const pid = req.params;
+            const deletedProduct = await ProductRepository.deleteProduct(pid);
             res.status(200).json({
                 mensaje: "Producto borrado exitosamente!",
                 payload: deletedProduct

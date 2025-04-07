@@ -1,43 +1,42 @@
 import ProductManager from "../dao/db/product.manager.js";
-import CartService from "../services/cart.service.js";
-const cartService = new CartService();
+import CartRepository from "../repositories/cart.repository.js";
 const productManager = new ProductManager();
+const cartRepository = new CartRepository();
 
 class ViewsController {
     async renderProducts(req, res) {
 
         try {
             const { page = 1, limit = 3 } = req.query;
-            const productos = await productManager.obtenerProductos({
+            const products = await productManager.getAllProducts({
                 page: parseInt(page),
                 limit: parseInt(limit)
             });
 
-            const todosProductos = productos.docs.map(producto => {
-                const { _id, ...rest } = producto.toObject();
+            const allProducts = products.docs.map(product => {
+                const { id: _id, ...rest } = product.toObject();
                 return rest;
             });
 
             res.render("products", {
-                productos: todosProductos,
-                hasPrevPage: productos.hasPrevPage,
-                hasNextPage: productos.hasNextPage,
-                prevPage: productos.prevPage,
-                nextPage: productos.nextPage,
-                currentPage: productos.page,
-                totalPages: productos.totalPages
+                productos: allProducts,
+                hasPrevPage: products.hasPrevPage,
+                hasNextPage: products.hasNextPage,
+                prevPage: products.prevPage,
+                nextPage: products.nextPage,
+                currentPage: products.page,
+                totalPages: products.totalPages
             });
 
         } catch (error) {
-            console.log("Error al obtener los productos. " + error);
-            res.status(500).json({ mensaje: "Error en Servidor/DB.", error });
+            throw error;
         };
     };
 
     async renderCart(req, res) {
         try {
             const cid = req.params.cid;
-            const cart = await cartService.getElementsInCart(cid);
+            const cart = await cartRepository.getCartById(cid);
             if (!cart) throw new Error("Error al buscar carrito con ese id");
 
             let Amount = 0;

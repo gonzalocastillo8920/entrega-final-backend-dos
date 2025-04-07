@@ -3,7 +3,7 @@ import ProductModel from "../models/product.model.js"
 class ProductManager {
 
     // Metodo para obtener Todos los Productos:
-    async obtenerProductos({ limit = 10, page = 1, sort, query } = {}) {
+    async getAllProducts({ limit = 10, page = 1, sort, query } = {}) {
 
         try {
             const skip = (page - 1) * limit;
@@ -20,20 +20,20 @@ class ProductManager {
                 };
             };
 
-            const productos = await ProductModel
+            const products = await ProductModel
                 .find(queryOptions)
                 .sort(sortOptions)
                 .skip(skip)
                 .limit(limit)
 
-            const totalProductos = await ProductModel.countDocuments(queryOptions);
+            const totalProducts = await ProductModel.countDocuments(queryOptions);
 
-            const totalPages = Math.ceil(totalProductos / limit);
+            const totalPages = Math.ceil(totalProducts / limit);
             const hasPrevPage = page > 1;
             const hasNextPage = page < totalPages;
 
             return {
-                docs: productos,
+                docs: products,
                 totalPages,
                 prevPage: hasPrevPage ? page - 1 : null,
                 nextPage: hasNextPage ? page + 1 : null,
@@ -43,14 +43,14 @@ class ProductManager {
                 prevLink: hasPrevPage ? `/api/products?limit=${limit}&page=${page - 1}&sort=${sort}&query=${query}` : null,
                 nextLink: hasNextPage ? `/api/products?limit=${limit}&page=${page + 1}&sort=${sort}&query=${query}` : null,
             };
+
         } catch (error) {
-            console.log("Error al cargar los productos. " + error);
             throw error;
         };
     };
 
     // Metodo para Agregar un Producto:
-    async agregarProducto({ code, title, price, category, thumbnails, stock, description, status }) {
+    async addProduct({ code, title, price, category, thumbnails, stock, description, status }) {
 
         try {
 
@@ -59,14 +59,14 @@ class ProductManager {
                 return;
             };
 
-            const existeProducto = await ProductModel.findOne({ code: code });
+            const product = await ProductModel.findOne({ code: code });
 
-            if (existeProducto) {
-                console.log("El codigo del Producto ya existe!");
+            if (product) {
+                console.log("El codigo del producto ya existe!");
                 return;
             };
 
-            const producto = new ProductModel({
+            const newProduct = new ProductModel({
                 code,
                 title,
                 price,
@@ -77,58 +77,43 @@ class ProductManager {
                 status: true
             });
 
-            await producto.save();
+            await newProduct.save();
+            return newProduct;
 
         } catch (error) {
-            console.log("Error al agregar el producto. " + error);
             throw error;
         };
     };
 
     // Metodo para Obtener un Producto por ID:
-    async obtenerProductPorId(idProducto) {
+    async getProductById(pid) {
         try {
-            const producto = await ProductModel.findById(idProducto);
-            if (!producto) {
-                console.log("Producto no encontrado.");
-                return null;
-            };
-            return producto;
+            const product = await ProductModel.findById(pid);
+            if (!product) return null;
+            return product;
         } catch (error) {
-            console.log("Error al buscar el producto." + error);
             throw error;
         };
     };
 
     // Metodo para Actualizar un Producto:
-    async actualizarProductoPorId(idProducto, productoAct) {
+    async updateProduct(pid, newData) {
         try {
-            const productoActualizado = await ProductModel.findByIdAndUpdate(idProducto, productoAct);
-            if (!productoActualizado) {
-                console.log("No se encuentra el producto");
-                return null;
-            };
-            console.log("Producto actualizado!");
-            
-            return productoActualizado;
+            const updatedProduct = await ProductModel.findByIdAndUpdate(pid, newData);
+            if (!updatedProduct) return null;
+            return updatedProduct;
         } catch (error) {
-            console.log("Error al actualizar el producto. " + error);
             throw error;
-        }
+        };
     };
 
     // Metodo para eliminar un producto por ID:
-    async eliminarProductoPorId(idProducto) {
+    async deleteProduct(pid) {
         try {
-            const producto = await ProductModel.findByIdAndDelete(idProducto);
-
-            if (!producto) {
-                console.log("El producto seleccionado no existe.");
-                return null;
-            };
-            console.log("Producto eliminado correctamente!");
+            const product = await ProductModel.findByIdAndDelete(pid);
+            if (!product) return null;
+            return product;
         } catch (error) {
-            console.log("Error al eliminar el producto. " + error);
             throw error;
         };
     };

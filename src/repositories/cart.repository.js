@@ -11,7 +11,7 @@ class CartRepository {
         };
     };
 
-    async getProductsInCart(cid) {
+    async getCartById(cid) {
         try {
             const cart = await CartModel.findById(cid);
             if (!cart) throw new Error("No existe ese carrito con el id especificado, verifique");
@@ -23,8 +23,8 @@ class CartRepository {
 
     async addProductInCart(cid, pid, quantity = 1) {
         try {
-            const cart = await this.getProductsInCart(cid);
-            const product = cart.products.find(item => item.product._id.toString() === pid);
+            const cart = await this.getCartById(cid);
+            const product = cart.products.find(item => item.product._id.toString() == pid);
 
             if (product) {
                 product.quantity += quantity;

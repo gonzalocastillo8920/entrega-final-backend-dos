@@ -1,5 +1,5 @@
 import CartRepository from "../repositories/cart.repository.js";
-import ProductService from "../services/product.service.js";
+import productRepository from "../repositories/product.repository.js";
 import UserDao from "../dao/user.dao.js";
 import TicketModel from "../dao/models/ticket.model.js";
 import { ramdomCode, totalAmount } from "../utils/cart.utils.js";
@@ -108,16 +108,17 @@ class CartController {
     async checkout(req, res) {
         try {
             const cid = req.params.cid;
-            const cart = await cartRepository.getProductsInCart(cid);
+            const cart = await cartRepository.getCartById(cid);
+            if(cart.products.length === 0) return res.status(400).json({mensaje: "Carrito Vacio"});
             const products = cart.products;
 
             const productsWoStock = []; // productos sin stock
 
             for(const item of products) {
                 const pid = item.product;
-                const product = await ProductService.getProductById(pid);
+                const product = await productRepository.getProductById(pid);
                 if(product.stock >= item.quantity) {
-                    // si hay suficiente stock, restar la cantidad de producto
+                    // si hay suficiente stock, restar la cantidad de producto y guardar el carrito para calcular Amount
                     product.stock -= item.quantity;
                     await product.save();
                 } else {
@@ -133,7 +134,7 @@ class CartController {
                 code: ramdomCode(),
                 purchase_datetime: new Date(),
                 amount: totalAmount(cart.products),
-                purchaser: userWithCart._id
+                purchaser: userWithCart.email
             });
             await ticket.save();
 
